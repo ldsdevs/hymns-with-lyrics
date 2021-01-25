@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hymns</title>
+    <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8.2.0/dist/polyfill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/whatwg-fetch@3.5.0/dist/fetch.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <ul>
+            <li v-for="(item,id) in index" :key="id" ><a :href="id">{{id}}</a></li>
+        </ul>
+        <div>
+            <h2>{{selectedItem.label}}</h2>
+            <div class="audio-player">
+                <audio v-if="selectedItem.media" id="audio" controls :src="selectedItem.media" onload="this.play()"></audio>
+            </div>
+            <div class="lyric-line" v-for="(line,idx) in selectedItem.lyrics" :key="idx" >
+                {{line}}
+            </div>
+        </div>
+    </div>
+    <script>
+var app = new Vue({
+  el: '#app',
+  data: {
+    index: {},
+    selectedItem: {}
+  },
+  mounted: function(){
+      var self=this;
+      fetch('json/hymns-es.json')
+        .then(function(response){
+            return response.json();
+        })
+        .then(function(json){
+            self.index=json;
+            self.changed();
+            window.addEventListener("hashchange",self.changed);
+        })
+  },
+  methods:{
+      changed: function(){
+        if (document.location.hash!=''){
+            var sel=this.index[document.location.hash];
+            if (sel){
+                this.selectItem(document.location.hash);
+            }
+        }
+      },
+      selectItem: function(id){
+        var item=this.index[id];
+        if (!item){
+            return;
+        }
+        console.log("sel",item)
+        var self=this;
+        if (!item.media){
+            fetch('api.php?action=data&url='+encodeURIComponent(item.url))
+            .then(function(response){
+                return response.json()
+            })
+            .then(function(json){
+                item.lyrics=json.lyrics;
+                item.pdf=json.pdf;
+                item.media=json.media;
+                self.index[id]=item;
+                self.selectedItem=item;
+                self.$forceUpdate();
+            })
+        }
+        this.selectedItem=item;
+      }
+  }
+})
+    </script>
+</body>
+</html>

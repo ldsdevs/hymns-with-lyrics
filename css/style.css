@@ -1,0 +1,45 @@
+body{
+    background-color: rgb(23, 51, 15);
+    color: rgb(235, 230, 163);
+}
+
+html * {
+    font-family: Cardo, Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+a:link, a:hover, a:visited{
+    color: #ff0;
+    text-decoration: none;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+p{
+    text-align: center;
+}
+
+ul {
+    margin: 0.5em 1em 1em 1em;
+    overflow-y: auto;
+    white-space: nowrap;
+    padding-inline-start: 0px;
+    background-color: rgb(38, 83, 25);
+    border-radius: 5px;
+}
+ul > li{
+    display: inline-block;
+    padding: 0 0.6em;
+    line-height: 2em;
+}
+
+.lyric-line{
+    text-align: center;
+    line-height: 1.5em;
+    font-size: 1.2rem;
+}
+
+.audio-player{
+    text-align: center;
+}
