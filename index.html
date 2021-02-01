@@ -9,18 +9,37 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?20210131">
+    <style>
+    </style>
 </head>
 <body>
-    <div id="app">
-        <ul>
+    <div id="app" :style="{fontSize:fontSize+'px'}">
+        <div class="menu" id="sel" @click="showSelection()">=
+        </div>
+        <div class="menu" id="zoomin" @click="fontSize+=2">+
+        </div>
+        <div class="menu" id="zoomout" @click="fontSize-=2">-
+        </div>
+        <ul class="selection" v-if="selection"  @click="hideSelection()">
             <li v-for="(item,id) in index" :key="id" ><a :href="id">{{id}}</a></li>
         </ul>
-        <div>
+        <div class="header">
             <h2>{{selectedItem.label}}</h2>
             <div class="audio-player">
-                <audio v-if="selectedItem.media" id="audio" controls :src="selectedItem.media" onload="this.play()"></audio>
+                <audio ref="audio" v-if="selectedItem.media" id="audio" controls :src="selectedItem.media" onload="this.play()"></audio>
+                <div class="player">
+                    <a class="play" v-if="!playing" @click="play()">▶</a>
+                    <a class="play" v-if="playing" @click="pause()">🁢🁢 </a>
+                    <a class="play" @click="stop()">◼︎</a>
+                    <progress class="time" :value="currentTime" :max="currentMax" @click="setPosition($event)"></progress>
+                    <a class="play" @click="stop()">◼︎</a>
+                    <progress class="volume" :value="currentTime" :max="currentMax" @click="setPosition($event)"></progress>
+                </div>
             </div>
+        </div>
+        <div class="lyrics">
+            
             <div class="lyric-line" v-for="(line,idx) in selectedItem.lyrics" :key="idx" >
                 {{line}}
             </div>
@@ -31,7 +50,12 @@ var app = new Vue({
   el: '#app',
   data: {
     index: {},
-    selectedItem: {}
+    selectedItem: {},
+    selection: false,
+    fontSize: 18,
+    currentTime: 0,
+    currentMax: 100,
+    playing: false
   },
   mounted: function(){
       var self=this;
@@ -44,6 +68,13 @@ var app = new Vue({
             self.changed();
             window.addEventListener("hashchange",self.changed);
         })
+      var self=this;
+      setInterval(function(){
+          var audio=self.$refs.audio;
+          self.currentTime = audio.currentTime;
+          self.currentMax= audio.duration;
+          self.playing= !audio.paused
+      },300)
   },
   methods:{
       changed: function(){
@@ -53,6 +84,26 @@ var app = new Vue({
                 this.selectItem(document.location.hash);
             }
         }
+      },
+      play: function(){
+        this.$refs.audio.play();
+      },
+      pause: function(){
+        this.$refs.audio.pause();
+      },
+      stop: function(){
+        this.$refs.audio.pause();
+        this.$refs.audio.currentTime=0;
+      },
+      showSelection: function(){
+        this.selection = true;
+      },
+      hideSelection: function(){
+        this.selection = false;
+      },
+      setPosition: function(ev){
+        console.log(ev.offsetX,ev.target.scrollWidth);
+        this.$refs.audio.currentTime=this.$refs.audio.duration*ev.offsetX/ev.target.scrollWidth;
       },
       selectItem: function(id){
         var item=this.index[id];
