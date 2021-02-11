@@ -40,7 +40,7 @@ h1, h2 {
     padding-bottom: 1em;
 }
 .header 
-.play{
+.icon{
     width: 1.8em;
     height: 1.8em;
     font-size: 1.125em;
@@ -48,9 +48,23 @@ h1, h2 {
     padding-top: 0.2em;
     padding-left: 0.2em;
     flex: 0 0 1.8em;
-    background-color: rgba(255,255,0,0.7);
     margin: 0 0.5em;
     box-sizing: border-box;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 1.8em 1.8em;
+}
+.icon.play{
+    background-image: url('../icons/play.svg');
+}
+.icon.volume{
+    background-image: url('../icons/volume-up.svg');
+}
+.icon.mute{
+    background-image: url('../icons/no-sound.svg');
+}
+.icon.pause{
+    background-image: url('../icons/pause.svg');
 }
 progress{
     width: 100%;
@@ -59,13 +73,15 @@ progress{
 }
 progress[value]::-webkit-progress-bar{
     border-radius: 5px;
-    background-color: #ff0;
+    background-color: rgb(36, 68, 20);
 }
 progress[value]::-webkit-progress-value{
-    background-color: #0c0;
-    border-radius: 5px 0 0 5px;
+    background-color: rgb(255,255,0);
+    border-radius: 5px;
 }
-
+progress.volume{
+    width: 20%;
+}
 p{
     text-align: center;
 }
@@ -84,7 +100,7 @@ ul > li{
     line-height: 2em;
 }
 .lyrics{
-    background-color: rgba(36, 68, 20)
+    background-color: rgb(36, 68, 20)
 }
 .lyric-line{
     text-align: center;

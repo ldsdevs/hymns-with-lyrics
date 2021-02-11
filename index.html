@@ -29,12 +29,12 @@
             <div class="audio-player">
                 <audio ref="audio" v-if="selectedItem.media" id="audio" controls :src="selectedItem.media" onload="this.play()"></audio>
                 <div class="player">
-                    <a class="play" v-if="!playing" @click="play()">▶</a>
-                    <a class="play" v-if="playing" @click="pause()">🁢🁢 </a>
-                    <a class="play" @click="stop()">◼︎</a>
+                    <a class="icon play" v-if="!playing" @click="play()"></a>
+                    <a class="icon pause" v-if="playing" @click="pause()"></a>
                     <progress class="time" :value="currentTime" :max="currentMax" @click="setPosition($event)"></progress>
-                    <a class="play" @click="stop()">◼︎</a>
-                    <progress class="volume" :value="currentTime" :max="currentMax" @click="setPosition($event)"></progress>
+                    <a class="icon volume" v-if="!muted" @click="mute()"></a>
+                    <a class="icon mute" v-if="muted" @click="unmute()"></a>
+                    <progress class="volume" :value="currentVolume" :max="100" @click="setVolume($event)"></progress>
                 </div>
             </div>
         </div>
@@ -55,7 +55,9 @@ var app = new Vue({
     fontSize: 18,
     currentTime: 0,
     currentMax: 100,
-    playing: false
+    playing: false,
+    currentVolume: 100,
+    muted:false
   },
   mounted: function(){
       var self=this;
@@ -71,9 +73,19 @@ var app = new Vue({
       var self=this;
       setInterval(function(){
           var audio=self.$refs.audio;
-          self.currentTime = audio.currentTime;
-          self.currentMax= audio.duration;
-          self.playing= !audio.paused
+          if (audio){
+              self.currentTime = audio.currentTime;
+              self.currentMax= audio.duration;
+              self.playing= !audio.paused;
+              self.muted= audio.muted;
+              self.currentVolume= audio.volume*100;
+          } else {
+              self.playing= false;
+              self.currentTime = 0;
+              self.currentMax = 1;
+              self.muted = false;
+              self.currentVolume = 100;
+          }
       },300)
   },
   methods:{
@@ -87,6 +99,12 @@ var app = new Vue({
       },
       play: function(){
         this.$refs.audio.play();
+      },
+      mute: function(){
+        this.$refs.audio.muted =true;
+      },
+      unmute: function(){
+        this.$refs.audio.muted = false;
       },
       pause: function(){
         this.$refs.audio.pause();
@@ -102,8 +120,12 @@ var app = new Vue({
         this.selection = false;
       },
       setPosition: function(ev){
-        console.log(ev.offsetX,ev.target.scrollWidth);
+        // console.log(ev.offsetX,ev.target.scrollWidth);
         this.$refs.audio.currentTime=this.$refs.audio.duration*ev.offsetX/ev.target.scrollWidth;
+      },
+      setVolume: function(ev){
+        // console.log(ev.offsetX,ev.target.scrollWidth);
+        this.$refs.audio.volume=1*ev.offsetX/ev.target.scrollWidth;
       },
       selectItem: function(id){
         var item=this.index[id];
